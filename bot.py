@@ -2,7 +2,7 @@ import os
 import asyncio
 import logging
 from pyrogram import Client, filters
-from pyrogram.types import Message, ChatPrivileges
+from pyrogram.types import Message
 from pyrogram.errors import RPCError
 
 # ==========================================
@@ -11,20 +11,17 @@ from pyrogram.errors import RPCError
 
 OWNER_ID = 7792838970
 
-# ملاحظة: إذا كنت لا تمتلك api_id و api_hash خاصة بك بسبب مشكلة الموقع،
-# يمكنك استخدام القيم الافتراضية الرسمية لتطبيق Telegram Android أدناه مؤقتاً لتجاوز المشكلة:
+# بيانات التطبيق الرسمية لتلجرام (تستخدم لتشغيل الحساب)
 API_ID = 611335
 API_HASH = "d524b414d21f4d37f08684c1f4cacf0c"
 
-# إعدادات التسجيل (Logs)
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
     level=logging.INFO,
 )
 logger = logging.getLogger("LORD-UserBot")
 
-# تعريف عميل Pyrogram (اليوزربوت)
-# عند التشغيل لأول مرة على Render، سيطلب منك رقم الهاتف وكود التحقق (OTP) في شاشة السجلات (Logs)
+# إنشاء العميل
 app = Client(
     "lord_userbot_session",
     api_id=API_ID,
@@ -42,7 +39,7 @@ async def start_command(client: Client, message: Message):
         "✅ يعمل اليوزربوت بنجاح بحسابك الشخصي.\n\n"
         "**الأوامر المتاحة:**\n"
         "• `/ban` - حظر عضو بالرد عليه\n"
-        "• `/banall` - حظر جميع أعضاء القروب دفعة واحدة\n"
+        "• `/banall` - حظر جميع أعضاء القروب\n"
         "• `/admins` - عرض مشرفي القروب\n"
         "• `/id` - عرض الآيديهات"
     )
@@ -88,10 +85,9 @@ async def ban_command(client: Client, message: Message):
         await client.ban_chat_member(message.chat.id, target.id)
         await message.reply_text(f"✅ تم حظر العضو: {target.mention}")
     except RPCError as e:
-        await message.reply_text(f"❌ فشل الحظر بسبب نقص الصلاحيات أو خطأ: {e}")
+        await message.reply_text(f"❌ فشل الحظر: {e}")
 
 
-# الميزة الكبرى التي طلبناها: الحظر الشامل (BanAll) الحقيقي بفضل صلاحيات اليوزربوت!
 @app.on_message(filters.command("banall") & filters.group)
 async def banall_command(client: Client, message: Message):
     if not is_owner(message.from_user.id):
@@ -103,7 +99,6 @@ async def banall_command(client: Client, message: Message):
 
     try:
         async for member in client.get_chat_members(message.chat.id):
-            # استثناء المالك، البوتات، والمشرفين لكي لا تحدث أخطاء
             if member.user.id == OWNER_ID or member.user.is_bot:
                 continue
             if member.status in ["administrator", "creator"]:
@@ -112,9 +107,8 @@ async def banall_command(client: Client, message: Message):
             try:
                 await client.ban_chat_member(message.chat.id, member.user.id)
                 banned_count += 1
-                await asyncio.sleep(0.5) # لتجنب حظر الفلود من تيليجرام
+                await asyncio.sleep(0.5)
             except RPCError:
-                failed_count + 1
                 failed_count += 1
 
         await status_msg.edit_text(
@@ -127,7 +121,7 @@ async def banall_command(client: Client, message: Message):
 
 
 def main():
-    logger.info("LORD UserBot is starting with Pyrogram...")
+    logger.info("LORD UserBot is starting...")
     app.run()
 
 
