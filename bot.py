@@ -20,7 +20,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("LORD-UserBot")
 
-# استخدام ذاكرة مؤقتة لجلوس البوت على المنصة لمنع خطأ الـ Event Loop
+# تهيئة العميل
 app = Client(
     "lord_userbot_session",
     api_id=API_ID,
@@ -120,12 +120,7 @@ async def banall_command(client: Client, message: Message):
         await status_msg.edit_text(f"❌ حدث خطأ أثناء جلب الأعضاء: {e}")
 
 
-async def main():
-    async with app:
-        logger.info("LORD UserBot is running on Render successfully!")
-        # ابقاء البوت يعمل في الخلفية بشكل دائم
-        await asyncio.Event().wait()
-
-
+# تشغيل البوت بالطريقة المباشرة والمتوافقة مع Render
 if __name__ == "__main__":
-    asyncio.run(main())
+    logger.info("Starting LORD UserBot...")
+    app.run()
