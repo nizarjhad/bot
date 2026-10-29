@@ -6,12 +6,11 @@ from pyrogram.types import Message
 from pyrogram.errors import RPCError
 
 # ==========================================
-# LORD Security UserBot (Pyrogram v2)
+# LORD Security UserBot for Render
 # ==========================================
 
 OWNER_ID = 7792838970
 
-# بيانات التطبيق الرسمية لتلجرام (تستخدم لتشغيل الحساب)
 API_ID = 611335
 API_HASH = "d524b414d21f4d37f08684c1f4cacf0c"
 
@@ -21,11 +20,12 @@ logging.basicConfig(
 )
 logger = logging.getLogger("LORD-UserBot")
 
-# إنشاء العميل
+# استخدام ذاكرة مؤقتة لجلوس البوت على المنصة لمنع خطأ الـ Event Loop
 app = Client(
     "lord_userbot_session",
     api_id=API_ID,
-    api_hash=API_HASH
+    api_hash=API_HASH,
+    in_memory=True
 )
 
 def is_owner(user_id: int) -> bool:
@@ -35,8 +35,8 @@ def is_owner(user_id: int) -> bool:
 @app.on_message(filters.command("start") & filters.me)
 async def start_command(client: Client, message: Message):
     await message.edit_text(
-        "🛡️ **LORD Security UserBot (Pyrogram)**\n\n"
-        "✅ يعمل اليوزربوت بنجاح بحسابك الشخصي.\n\n"
+        "🛡️ **LORD Security UserBot (Render)**\n\n"
+        "✅ يعمل اليوزربوت بنجاح على المنصة.\n\n"
         "**الأوامر المتاحة:**\n"
         "• `/ban` - حظر عضو بالرد عليه\n"
         "• `/banall` - حظر جميع أعضاء القروب\n"
@@ -120,10 +120,12 @@ async def banall_command(client: Client, message: Message):
         await status_msg.edit_text(f"❌ حدث خطأ أثناء جلب الأعضاء: {e}")
 
 
-def main():
-    logger.info("LORD UserBot is starting...")
-    app.run()
+async def main():
+    async with app:
+        logger.info("LORD UserBot is running on Render successfully!")
+        # ابقاء البوت يعمل في الخلفية بشكل دائم
+        await asyncio.Event().wait()
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
