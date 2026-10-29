@@ -1,2 +1,1 @@
-pip install pyrogram && python
-bot.py
+pyrogram
