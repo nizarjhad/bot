@@ -1,2 +1,2 @@
-telethon
-python-telegram-bot
+pip install pyrogram && python
+bot.py
